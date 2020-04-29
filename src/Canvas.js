@@ -4,13 +4,15 @@ import styled from 'styled-components';
 const StyledCanvas = styled.canvas`
   display:block;
   background:peachpuff;
+  margin: 0 auto;
 `;
 
 class Canvas extends Component {
     constructor(props) {
         super(props);
         this.state = { 
-            lineWidth : 1,
+            lineWidth : 3,
+            strokeStyle: "black",
             painting: false,
          }
          this.whiteboard = React.createRef();
@@ -18,8 +20,8 @@ class Canvas extends Component {
     }
 
     componentDidMount() {
-        // this.canvas.height = window.innerHeight;
-        // this.canvas.width = window.innerWidth;
+        this.canvas.height = 500;
+        this.canvas.width = 500;
         this.ctx = this.canvas.getContext('2d');
         this.ctx.lineWidth = 5;
         this.ctx.lineCap = "round";
@@ -48,6 +50,8 @@ class Canvas extends Component {
     finishPainting = () => {
         this.setState({
             painting: false
+        }, () => {
+            this.ctx.beginPath();
         })
     }
 
@@ -62,13 +66,19 @@ class Canvas extends Component {
         if(this.state.painting){
             var x,y;
             [x,y] = this.getPosition(e);
+            this.ctx.lineWidth = this.state.lineWidth;
+            this.ctx.strokeStyle = this.state.strokeStyle;
+            this.ctx.lineTo(x,y);
+            this.ctx.stroke();
             this.ctx.beginPath();
-            this.ctx.arc(x,y, 5, 0, Math.PI*2);
-            this.ctx.fill();
-
-            
-
+            this.ctx.moveTo(x,y);
         }   
+    }
+
+    screenshot = () => {
+        let x = (JSON.stringify(this.canvas));
+        console.log(x);
+        console.log(x.length);
     }
 
     
@@ -77,9 +87,7 @@ class Canvas extends Component {
         return ( 
             <div>
                 <StyledCanvas  ref={(ref) => (this.canvas = ref)}></StyledCanvas>
-                {/* <button onClick={this.onChangeWidth}>change</button> */}
-                <button onClick={this.paintingOn}>paint</button>
-                {/* <button onClick={this.onChangeColor}>yellow</button> */}
+                <button onClick={this.paintingOn}>paint</button>               
             </div>
          );
     }

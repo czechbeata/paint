@@ -1,10 +1,19 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import CanvasOptions from './CanvasOptions';
+
+const Box = styled.section`
+  position: relative;
+  
+`;
 
 const StyledCanvas = styled.canvas`
   display:block;
-  background:peachpuff;
-  margin: 0 auto;
+  background:white;
+`;
+
+const Button = styled.button`
+  background:green;
 `;
 
 class Canvas extends Component {
@@ -20,8 +29,8 @@ class Canvas extends Component {
     }
 
     componentDidMount() {
-        this.canvas.height = 500;
-        this.canvas.width = 500;
+        this.canvas.height = window.innerHeight;
+        this.canvas.width = window.innerWidth;
         this.ctx = this.canvas.getContext('2d');
         this.ctx.lineWidth = 5;
         this.ctx.lineCap = "round";
@@ -64,6 +73,7 @@ class Canvas extends Component {
         
     paint (e) {
         if(this.state.painting){
+            console.log("painting");
             var x,y;
             [x,y] = this.getPosition(e);
             this.ctx.lineWidth = this.state.lineWidth;
@@ -81,14 +91,16 @@ class Canvas extends Component {
         console.log(x.length);
     }
 
-    
-
     render() { 
         return ( 
-            <div>
+            <Box>
+                <CanvasOptions
+                paintingOn = {this.paintingOn}
+                >
+                    {/* <Button onClick={this.paintingOn}>paint</Button>                */}
+                </CanvasOptions>
                 <StyledCanvas  ref={(ref) => (this.canvas = ref)}></StyledCanvas>
-                <button onClick={this.paintingOn}>paint</button>               
-            </div>
+            </Box>
          );
     }
 }

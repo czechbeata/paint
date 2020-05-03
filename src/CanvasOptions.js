@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import Option from './Option';
 import stroke from './stroke.svg';
+import palette from './palette.svg';
+import highlighter from './highlighter.svg';
+import ColorPalette from './Colorpalette';
 
 const StyledCanvasOptions = styled.ul`
   width:500px;
@@ -14,6 +17,36 @@ const StyledCanvasOptions = styled.ul`
   transform: translateX(-50%);
   z-index: 999;
 `;
+const OptionDetails = styled.div`
+  display:none;
+  background: white;
+  position:absolute;
+  padding:15px;
+  top: 50px;
+  left: -50%;
+`;
+const StyledOption = styled.button`
+  background:white;
+  border-right: 1px solid rgba(0,0,0,0.1);
+  height:50px;
+  padding: 5px 10px;
+  position:relative;
+  &:hover{
+      cursor:pointer;
+  }
+
+  &:hover ${OptionDetails}{
+    display:block;
+  }
+`;
+
+const OptionImage = styled.img`
+  width:50px;
+  height:40px;
+`;
+const WidthInput = styled.input`
+ 
+`;
 
 class CanvasOptions extends Component {
     constructor(props) {
@@ -23,10 +56,36 @@ class CanvasOptions extends Component {
     render() { 
         return ( 
             <StyledCanvasOptions className="shadow">
-                <Option paint={this.props.paintingOn} img={stroke}></Option>
+
+                <StyledOption onClick={() => this.props.toggleMode("painting")}>
+                    <OptionImage src={stroke} alt="stroke"></OptionImage>
+                    <OptionDetails className="shadow">
+                      <WidthInput 
+                        onChange={this.props.onChangeWidth} 
+                        type="range"  
+                        value={this.props.lineWidth} 
+                        min="1" 
+                        max="10"></WidthInput>
+                      </OptionDetails>
+                </StyledOption>
+                <StyledOption>
+                    <OptionImage src={palette} alt="palette"></OptionImage>
+                    <OptionDetails className="shadow">
+                       <ColorPalette 
+                       colors={this.props.colors}
+                       onChangeColor = {this.props.onChangeColor}
+                       ></ColorPalette>
+                    </OptionDetails>
+                </StyledOption>
+                <StyledOption onClick={() => this.props.toggleMode("highlighting")}>              
+                    <OptionImage src={highlighter} alt="highlighter"></OptionImage>
+                </StyledOption>
+                {/* <StyledOption onClick={this.props.clear}>
+                    <OptionImage src={eraser} alt="eraser"></OptionImage>
+                </StyledOption> */}
             </StyledCanvasOptions>
          );
     }
 }
- 
+
 export default CanvasOptions;

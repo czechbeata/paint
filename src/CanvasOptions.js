@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import Option from './Option';
 import stroke from './stroke.svg';
 import palette from './palette.svg';
+import grid from './grid.svg';
 import highlighter from './highlighter.svg';
 import ColorPalette from './Colorpalette';
 
@@ -80,9 +80,9 @@ class CanvasOptions extends Component {
                 <StyledOption onClick={() => this.props.toggleMode("highlighting")}>              
                     <OptionImage src={highlighter} alt="highlighter"></OptionImage>
                 </StyledOption>
-                {/* <StyledOption onClick={this.props.clear}>
-                    <OptionImage src={eraser} alt="eraser"></OptionImage>
-                </StyledOption> */}
+                <StyledOption onClick={this.props.drawGrid}>
+                    <OptionImage src={grid} alt="grid"></OptionImage>
+                </StyledOption>
             </StyledCanvasOptions>
          );
     }

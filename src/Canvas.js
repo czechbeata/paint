@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import CanvasOptions from './CanvasOptions';
 import eraser from './cross.svg';
+import smallgrid from './smallgrid.svg'
 
 const Box = styled.section`
   position: relative;
-  
 `;
 
 const StyledCanvas = styled.canvas`
   display:block;
-  background:white;
+  /* background-image: url(${eraser}); */
+
 `;
 
 const Button = styled.button`
@@ -35,9 +36,10 @@ class Canvas extends Component {
     constructor(props) {
         super(props);
         this.state = { 
-            lineWidth : 3,
+            lineWidth : 5,
             strokeStyle: "black",
             mode: "painting",
+            gridSize: 40,
             painting: false,
             highlighting: false,
             colors: [
@@ -60,6 +62,7 @@ class Canvas extends Component {
         this.canvas.width = window.innerWidth;
         this.ctx = this.canvas.getContext('2d');
         this.ctx.lineCap = "round";
+
         this.canvas.addEventListener("mousedown", this.startPainting);
         this.canvas.addEventListener("mouseup", this.finishPainting);
         this.canvas.addEventListener("mousemove", this.paint);
@@ -150,14 +153,34 @@ class Canvas extends Component {
     clear = () => {
        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
+    drawGrid = () => {
+        var w = this.canvas.width; 
+        var h = this.canvas.height;
+
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeStyle = "rgba(0,0,0,0.2)";
+        var p = this.state.gridSize;
+        for (var x = 0; x <= w; x += p) {
+            this.ctx.moveTo(0.5 + x, 0);
+            this.ctx.lineTo(0.5 + x, h );
+        }
+      
+        for (var x = 0; x <= h; x += p) {
+            this.ctx.moveTo(0, 0.5 + x );
+            this.ctx.lineTo(w , 0.5 + x );
+        }
+        this.ctx.stroke();
+        this.ctx.beginPath();
+        this.ctx.lineWidth = this.state.lineWidth;
+        this.ctx.strokeStyle = this.state.strokeStyle;
+    }
 
     render() { 
         return ( 
             <Box>
                 <CanvasOptions 
-                paintingOn = {this.paintingOn}         
-                highlightingOn = {this.highlightingOn} 
-                toggleMode = {this.toggleMode}      
+                toggleMode = {this.toggleMode} 
+                drawGrid = {this.drawGrid}     
                 onChangeWidth = {this.onChangeWidth} 
                 onChangeColor = {this.onChangeColor} 
                 lineWidth = {this.state.lineWidth} 

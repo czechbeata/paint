@@ -2,13 +2,15 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import CanvasOptions from './CanvasOptions';
 import eraser from './cross.svg';
+import ReactDOM from 'react-dom';
 
 const Box = styled.section`
   position: relative;
 `;
 
 const StyledCanvas = styled.canvas`
-  display:block;
+  display: block;
+  position: relative;
 `;
 
 const Button = styled.button`
@@ -27,6 +29,15 @@ const ClearButton = styled(Button)`
 const Icon = styled.img`
   width: 40px;
   height: 40px;
+`;
+
+const Textarea = styled.textarea`
+  background:green;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width:200px;
+  height:100px;
 `;
 
 class Canvas extends Component {
@@ -167,7 +178,6 @@ class Canvas extends Component {
       }   
       
    }
-
    drawSquare = (e) => {
      if(this.state.mode === "square"){
       var x,y;
@@ -247,6 +257,28 @@ class Canvas extends Component {
       })
     }
   }
+
+  // TEXT
+
+  addTextArea = (e) => {
+    var x,y;
+    [x,y] = this.getPosition(e);
+
+    // standard DOM manipulation
+    var textarea = document.createElement('textarea');
+    textarea.className = 'info';
+    textarea.style.top = e.clientY + 'px';
+    textarea.style.left = e.clientX + 'px';
+    // textarea.style.border = 'none';
+    document.body.appendChild(textarea);
+
+    //react DOM manipulation
+    // ReactDOM.render(<Textarea />, document.body);
+    
+    this.setState({
+      mode: "painting"
+    })
+  }
  
 
 
@@ -272,7 +304,9 @@ class Canvas extends Component {
         case 'rectangle':
           this.drawRectangle(e);
           break;
-          
+        case 'textarea':
+          this.addTextArea(e);
+          break;
         default:
           this.startPainting(e);
       }
@@ -292,7 +326,6 @@ class Canvas extends Component {
           this.paint(e);
       }
     }
-
     onMouseUp = () => {
       switch(this.state.mode) {
         case 'painting':
@@ -348,7 +381,6 @@ class Canvas extends Component {
                   drawGrid = {this.drawGrid}  
                   onChangeColor = {this.onChangeColor} 
                   onChangeWidth = {this.onChangeWidth} 
-
                 >
                 </CanvasOptions>
 

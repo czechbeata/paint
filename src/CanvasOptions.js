@@ -97,6 +97,11 @@ class CanvasOptions extends Component {
                   ></FiguresGrid>
                   </OptionDetails>                
                 </StyledOption>
+
+                <StyledOption onClick={() => this.props.changeMode("textarea")}>
+                  <OptionImage src={stroke} alt="figures" ></OptionImage>              
+                </StyledOption>
+
             </StyledCanvasOptions>
          );
     }

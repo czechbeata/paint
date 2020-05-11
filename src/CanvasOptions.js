@@ -5,6 +5,8 @@ import palette from './palette.svg';
 import grid from './grid.svg';
 import highlighter from './highlighter.svg';
 import ColorPalette from './Colorpalette';
+import FiguresGrid from './FiguresGrid';
+import figures from './figures.svg';
 
 const StyledCanvasOptions = styled.ul`
   width:500px;
@@ -57,7 +59,7 @@ class CanvasOptions extends Component {
         return ( 
             <StyledCanvasOptions className="shadow">
 
-                <StyledOption onClick={() => this.props.toggleMode("painting")}>
+                <StyledOption onClick={() => this.props.changeMode("painting")}>
                     <OptionImage src={stroke} alt="stroke"></OptionImage>
                     <OptionDetails className="shadow">
                       <WidthInput 
@@ -68,6 +70,7 @@ class CanvasOptions extends Component {
                         max="10"></WidthInput>
                       </OptionDetails>
                 </StyledOption>
+                
                 <StyledOption>
                     <OptionImage src={palette} alt="palette"></OptionImage>
                     <OptionDetails className="shadow">
@@ -77,11 +80,22 @@ class CanvasOptions extends Component {
                        ></ColorPalette>
                     </OptionDetails>
                 </StyledOption>
-                <StyledOption onClick={() => this.props.toggleMode("highlighting")}>              
+
+                <StyledOption onClick={() => this.props.changeMode("highlighting")}>              
                     <OptionImage src={highlighter} alt="highlighter"></OptionImage>
                 </StyledOption>
+                
                 <StyledOption onClick={this.props.drawGrid}>
                     <OptionImage src={grid} alt="grid"></OptionImage>
+                </StyledOption>
+
+                <StyledOption >
+                  <OptionImage src={figures} alt="figures"></OptionImage>
+                  <OptionDetails className="shadow">
+                  <FiguresGrid
+                    changeMode = {this.props.changeMode}
+                  ></FiguresGrid>
+                  </OptionDetails>                
                 </StyledOption>
             </StyledCanvasOptions>
          );

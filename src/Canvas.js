@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import CanvasOptions from './CanvasOptions';
 import eraser from './cross.svg';
-import smallgrid from './smallgrid.svg'
 
 const Box = styled.section`
   position: relative;
@@ -10,8 +9,6 @@ const Box = styled.section`
 
 const StyledCanvas = styled.canvas`
   display:block;
-  /* background-image: url(${eraser}); */
-
 `;
 
 const Button = styled.button`
@@ -36,12 +33,14 @@ class Canvas extends Component {
     constructor(props) {
         super(props);
         this.state = { 
+            mode : "painting",
             lineWidth : 5,
             strokeStyle: "black",
             mode: "painting",
             gridSize: 40,
             painting: false,
             highlighting: false,
+            triangle: false,
             colors: [
                 {name: "pink", color: "pink"},
                 {name: "green", color: "green"},
@@ -54,84 +53,78 @@ class Canvas extends Component {
             ],
          }
          this.whiteboard = React.createRef();
-         this.paint = this.paint.bind(this);
+        //  this.paint = this.paint.bind(this);
     }
 
     componentDidMount() {
         this.canvas.height = window.innerHeight;
         this.canvas.width = window.innerWidth;
         this.ctx = this.canvas.getContext('2d');
-        this.ctx.lineCap = "round";
+        this.ctx.lineCap = "round";      
 
-        this.canvas.addEventListener("mousedown", this.startPainting);
-        this.canvas.addEventListener("mouseup", this.finishPainting);
-        this.canvas.addEventListener("mousemove", this.paint);
+        this.canvas.addEventListener("mousedown", this.onMouseDown);
+        this.canvas.addEventListener("mouseup", this.onMouseUp);
+        this.canvas.addEventListener("mousemove", this.onMouseMove);
+    }
 
-        this.canvas.addEventListener("mousedown", this.startHighlighting);
-        this.canvas.addEventListener("mouseup", this.finishHighlighting);
-        this.canvas.addEventListener("mousemove", this.highlight);
-    }
-    toggleMode = (mode) => {
-        this.setState({
-            mode: mode
-        })
-    }
     onChangeWidth = (e) => {
-        console.log(e);
-        this.setState({
-            lineWidth: e.target.value
-        })
+      console.log(e);
+      this.setState({
+          lineWidth: e.target.value
+      })
+  }
+
+    changeMode = (mode) => {
+        this.setState({ mode });
     }
-    onChangeColor = (color) => {
-        this.setState({
-            strokeStyle : color
-        })
-    }
-    startPainting = (e) => {
-        if(this.state.mode === "painting"){
-            this.setState({
-                painting: true,
-            }, () => {
-                this.ctx.lineWidth = this.state.lineWidth;
-                this.ctx.strokeStyle = this.state.strokeStyle;
-                this.paint(e);
-            })
-        }else return;
-      
-    }
-    finishPainting = () => {
-        this.setState({
-            painting: false
-        }, () => {
-            this.ctx.beginPath();
-        })
-    }
+
     getPosition (e) {
-        var rect = this.canvas.getBoundingClientRect();
-        var x = e.clientX - rect.left;
-        var y = e.clientY - rect.top;
-        return [x, y];
-    }    
-    paint (e) {
-        if(this.state.painting){
-            console.log("painting");
-            var x,y;
-            [x,y] = this.getPosition(e);
-            this.ctx.lineWidth = this.state.lineWidth;
-            this.ctx.strokeStyle = this.state.strokeStyle;
-            this.ctx.lineTo(x,y);
-            this.ctx.stroke();
-            this.ctx.beginPath();
-            this.ctx.moveTo(x,y);
-        }else return;
+      var rect = this.canvas.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      return [x, y];
     }   
-    startHighlighting = () => {
-        if(this.state.mode === "highlighting"){
-            this.setState({
-                highlighting: true,
-            }, () => {             
-            })
-        }      
+
+    // PAINTING
+    startPainting = (e) => {    
+          this.setState({
+              painting: true,
+          }, () => {
+              this.ctx.lineWidth = this.state.lineWidth;
+              this.ctx.strokeStyle = this.state.strokeStyle;
+              this.paint(e);
+          })    
+    }
+
+    finishPainting = () => {
+      this.setState({
+          painting: false
+      }, () => {
+          this.ctx.beginPath();
+      })
+    }
+
+    paint = (e) => {
+      if(this.state.painting){
+          var x,y;
+          [x,y] = this.getPosition(e);
+          this.ctx.lineWidth = this.state.lineWidth;
+          this.ctx.strokeStyle = this.state.strokeStyle;
+          this.ctx.lineTo(x,y);
+          this.ctx.stroke();
+          this.ctx.beginPath();
+          this.ctx.moveTo(x,y);
+      }else return;
+    }   
+
+    // HIGHLIGHTING
+
+    startHighlighting = (e) => {     
+          this.setState({
+            highlighting: true,
+          }, () => {
+            this.highlight(e);    
+          })     
     }
     finishHighlighting = () => {
         this.setState({
@@ -142,7 +135,6 @@ class Canvas extends Component {
     }
     highlight = (e) => {
         if(this.state.highlighting){
-            console.log("highlighting");
             this.ctx.globalCompositeOperation = "multiply";
             var x,y;
             [x,y] = this.getPosition(e);
@@ -150,8 +142,178 @@ class Canvas extends Component {
             this.ctx.fillRect(x-10, y-10, 20,20);
         }else return;
     }
+
+    // FIGURES
+    drawRightTriangle = (e) => {
+ 
+      if(this.state.mode === "rightTriangle"){
+          var x,y;
+          [x,y] = this.getPosition(e);
+  
+          this.ctx.lineWidth = 3;
+          this.ctx.strokeStyle = '#666666';
+  
+          this.ctx.beginPath();
+          this.ctx.moveTo(x, y);
+          this.ctx.lineTo(x, y + 100);
+          this.ctx.lineTo(x + 100, y + 100);
+          this.ctx.closePath();
+          this.ctx.stroke();
+          this.ctx.beginPath();
+
+          this.setState({
+            mode: "painting"
+          })
+      }   
+      
+   }
+
+   drawSquare = (e) => {
+     if(this.state.mode === "square"){
+      var x,y;
+      [x,y] = this.getPosition(e);
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeStyle = '#666666';
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, y);
+      this.ctx.lineTo(x, y + 100);
+      this.ctx.lineTo(x + 100, y + 100);
+      this.ctx.lineTo(x + 100, y);
+      this.ctx.closePath();
+      this.ctx.stroke();
+      this.ctx.beginPath();
+
+      this.setState({
+        mode: "painting"
+      })
+
+     }
+   }
+   drawRectangle = (e) => {
+    if(this.state.mode === "rectangle"){
+      var x,y;
+      [x,y] = this.getPosition(e);
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeStyle = '#666666';
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, y);
+      this.ctx.lineTo(x, y + 100);
+      this.ctx.lineTo(x + 150, y + 100);
+      this.ctx.lineTo(x + 150, y);
+      this.ctx.closePath();
+      this.ctx.stroke();
+      this.ctx.beginPath();
+
+      this.setState({
+        mode: "painting"
+      })
+    }
+  }
+   drawCircle = (e) => {
+     if(this.state.mode === "circle"){
+      var x,y;
+      [x,y] = this.getPosition(e);
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeStyle = '#666666';
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, 50, 0, 2 * Math.PI);
+      this.ctx.stroke();
+      this.ctx.beginPath();
+
+      this.setState({
+        mode: "painting"
+      })
+     }
+   }
+   drawTriangle = (e) => {
+    if(this.state.mode === "triangle"){
+      var x,y;
+      [x,y] = this.getPosition(e);
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeStyle = '#666666';
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(x, y);
+      this.ctx.lineTo(x + 100, y);
+      this.ctx.lineTo(x + 50, y - 86);
+      this.ctx.closePath();
+      this.ctx.stroke();
+      this.ctx.beginPath();
+
+      this.setState({
+        mode: "painting"
+      })
+    }
+  }
+ 
+
+
+    onMouseDown = (e) => {
+      switch(this.state.mode) {
+        case 'painting':
+          this.startPainting(e);
+          break;
+        case 'highlighting':
+          this.startHighlighting(e);
+          break;
+        case 'rightTriangle':
+          this.drawRightTriangle(e);
+          break;
+        case 'triangle':
+          this.drawTriangle(e);
+        case 'circle':
+          this.drawCircle(e);
+          break;
+        case 'square':
+          this.drawSquare(e);
+          break;
+        case 'rectangle':
+          this.drawRectangle(e);
+          break;
+          
+        default:
+          this.startPainting(e);
+      }
+    }
+
+    onMouseMove = (e) => {
+      switch(this.state.mode) {
+        case 'painting':
+          this.paint(e);
+          break;
+        case 'highlighting':
+          this.highlight(e);
+          break;
+        case 'triangle':
+          break;
+        default:
+          this.paint(e);
+      }
+    }
+
+    onMouseUp = () => {
+      switch(this.state.mode) {
+        case 'painting':
+          this.finishPainting();
+          break;
+        case 'highlighting':
+          this.finishHighlighting();
+          break;
+        case 'triangle':
+          break;
+        default:
+          this.finishPainting();
+      }
+    }
+    onChangeColor = (color) => {
+      this.setState({
+          strokeStyle : color
+      })
+    }
     clear = () => {
-       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     drawGrid = () => {
         var w = this.canvas.width; 
@@ -175,19 +337,23 @@ class Canvas extends Component {
         this.ctx.strokeStyle = this.state.strokeStyle;
     }
 
+
     render() { 
+
         return ( 
             <Box>
                 <CanvasOptions 
-                toggleMode = {this.toggleMode} 
-                drawGrid = {this.drawGrid}     
-                onChangeWidth = {this.onChangeWidth} 
-                onChangeColor = {this.onChangeColor} 
-                lineWidth = {this.state.lineWidth} 
-                colors = {this.state.colors} 
+                  changeMode = {this.changeMode}
+                  colors = {this.state.colors} 
+                  drawGrid = {this.drawGrid}  
+                  onChangeColor = {this.onChangeColor} 
+                  onChangeWidth = {this.onChangeWidth} 
+
                 >
                 </CanvasOptions>
+
                 <StyledCanvas  ref={(ref) => (this.canvas = ref)}></StyledCanvas>
+                
                 <ClearButton onClick={this.clear}>
                     <Icon src = {eraser}></Icon>
                 </ClearButton>
